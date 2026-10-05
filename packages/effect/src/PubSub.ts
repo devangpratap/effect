@@ -162,6 +162,12 @@ export declare namespace PubSub {
     /**
      * Describes how publishers should signal to subscribers that they are
      * waiting for space to become available in the `PubSub`.
+     *
+     * **Details**
+     *
+     * The returned effect must remain interruptible while waiting and remove
+     * its pending elements on interruption. `end` interrupts custom surplus
+     * handling; the publisher waits for this cleanup before returning `false`.
      */
     handleSurplus(
       pubsub: Atomic<A>,
@@ -879,7 +885,7 @@ export const endUnsafe: {
 } = dual(2, <A>(self: PubSub<A>, value: A): boolean => {
   if (self.shutdownFlag.current || Option.isSome(self.ended.current)) return false
   MutableRef.set(self.ended, Option.some(value))
-  if (self.strategy instanceof BackPressureStrategy) {
+  if (isBackPressureStrategy(self.strategy)) {
     for (const [_, deferred, last] of MutableList.takeAll(self.strategy.publishers)) {
       if (last) Deferred.doneUnsafe(deferred, Exit.succeed(false))
     }
@@ -2451,16 +2457,24 @@ class PubSubImpl<in out A> implements PubSub<A> {
   }
 }
 
-// Settles suspended publishers of custom strategies with `false` when the
-// PubSub ends, as the built-in strategies are handled directly by `endUnsafe`.
+// Only the unchanged built-in surplus handlers can bypass the end signal.
+// Subclasses and instance-level overrides may suspend independently of the
+// built-in publisher queue.
+const isBackPressureStrategy = <A>(strategy: PubSub.Strategy<A>): strategy is BackPressureStrategy<A> =>
+  Object.getPrototypeOf(strategy) === BackPressureStrategy.prototype &&
+  strategy.handleSurplus === BackPressureStrategy.prototype.handleSurplus
+
+// Custom strategies cancel their pending elements through interruption cleanup.
 const endSignals = new WeakMap<PubSub<any>, Deferred.Deferred<boolean>>()
 
 const handleSurplus = <A>(self: PubSub<A>, elements: Iterable<A>): Effect.Effect<boolean> => {
   const effect = self.strategy.handleSurplus(self.pubsub, self.subscribers, elements, self.shutdownFlag)
   if (
-    self.strategy instanceof BackPressureStrategy ||
-    self.strategy instanceof DroppingStrategy ||
-    self.strategy instanceof SlidingStrategy
+    isBackPressureStrategy(self.strategy) ||
+    (Object.getPrototypeOf(self.strategy) === DroppingStrategy.prototype &&
+      self.strategy.handleSurplus === DroppingStrategy.prototype.handleSurplus) ||
+    (Object.getPrototypeOf(self.strategy) === SlidingStrategy.prototype &&
+      self.strategy.handleSurplus === SlidingStrategy.prototype.handleSurplus)
   ) {
     return effect
   }
@@ -2469,6 +2483,8 @@ const handleSurplus = <A>(self: PubSub<A>, elements: Iterable<A>): Effect.Effect
     signal = Deferred.makeUnsafe<boolean>()
     endSignals.set(self, signal)
   }
+  // raceFirst forks interruptible children even when the publisher is masked,
+  // and waits for the losing effect's interruption cleanup before returning.
   return Effect.raceFirst(effect, Deferred.await(signal))
 }
 
