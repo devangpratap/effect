@@ -1,5 +1,73 @@
 # effect
 
+## 4.0.2
+
+### Patch Changes
+
+- [#8760](https://github.com/Effect-TS/effect/pull/8760) [`467d3ac`](https://github.com/Effect-TS/effect/commit/467d3aceff3e8c98ba7dd4ffef9a267a8f14d105) Thanks @fubhy! - Include runtime layer errors in the result type of `AtomRuntime.subscriptionRef`.
+
+- [#8778](https://github.com/Effect-TS/effect/pull/8778) [`716e358`](https://github.com/Effect-TS/effect/commit/716e358e0ed263ea26da20f834cea69b6d5b1584) Thanks @fubhy! - Fix a stack overflow when many consecutive failure handlers throw synchronously. The thrown defect is now captured as the fiber's exit and pending finalizers still run.
+
+- [#8758](https://github.com/Effect-TS/effect/pull/8758) [`d0b3862`](https://github.com/Effect-TS/effect/commit/d0b3862b6525d09277b8fb48d981beb200ad09f5) Thanks @fubhy! - Fix `Channel.mapInput` data-last overload to preserve channel requirements and add the mapping function's requirements.
+
+- [#8811](https://github.com/Effect-TS/effect/pull/8811) [`e4cb9f1`](https://github.com/Effect-TS/effect/commit/e4cb9f1f58e18f443d883863240ad19dca4bffde) Thanks @fubhy! - Fix Standard Schema and Standard JSON Schema adapters to use the child schema rather than an inherited parent adapter.
+
+- [#8792](https://github.com/Effect-TS/effect/pull/8792) [`2e03688`](https://github.com/Effect-TS/effect/commit/2e03688cdf32194a30cc43bdcc85700fe211a6db) Thanks @fubhy! - Fix `Stream.peel` dropping the sink's unconsumed elements from a partially consumed chunk.
+
+- [#8742](https://github.com/Effect-TS/effect/pull/8742) [`4153144`](https://github.com/Effect-TS/effect/commit/4153144de56b785409efadae655b4889452d0e10) Thanks @wouter173! - Fix the data-last overload of `AsyncResult.flatMap` to correctly infer a changed success type.
+
+- [#8772](https://github.com/Effect-TS/effect/pull/8772) [`bd00773`](https://github.com/Effect-TS/effect/commit/bd00773b252970e576ffe0cce17b84c10ce3c81f) Thanks @juliusmarminge! - Read `HttpClientResponse.cookies` on platforms whose `Headers` has no `getSetCookie`, such as React Native, instead of throwing.
+
+- [#8759](https://github.com/Effect-TS/effect/pull/8759) [`44defad`](https://github.com/Effect-TS/effect/commit/44defad43f1f4c396fcd9373484be191506d7df8) Thanks @fubhy! - Fix `HttpServer` service `serve` to infer required services from the middleware-transformed app.
+
+- [#8767](https://github.com/Effect-TS/effect/pull/8767) [`98a5ed7`](https://github.com/Effect-TS/effect/commit/98a5ed7603de413c0939c9ae66503ebe462846cf) Thanks @fubhy! - Fix `HttpApiClient` and `AtomHttpApi` result types for union response modes while preserving decoded-only results when the mode is omitted.
+
+- [#8773](https://github.com/Effect-TS/effect/pull/8773) [`1f74b62`](https://github.com/Effect-TS/effect/commit/1f74b62b6c918bdea3e4416e701c490fcf6866ce) Thanks @juliusmarminge! - Add opt-in `allowSessionTermination` to `McpServer.layerHttp`. DELETE ends the session and interrupts its active requests; later requests with that session id return `404`.
+  
+  Fix an RPC cancellation race by registering request fibers before their handlers run.
+
+- [#8762](https://github.com/Effect-TS/effect/pull/8762) [`efebfa9`](https://github.com/Effect-TS/effect/commit/efebfa9cf9fb21ad8ac8156ecf6ca555ca55efa3) Thanks @fubhy! - Include completion-handler services in the requirements of `McpServer.registerPrompt` and `McpServer.prompt`, including optional handlers.
+
+- [#8819](https://github.com/Effect-TS/effect/pull/8819) [`a3b4cf3`](https://github.com/Effect-TS/effect/commit/a3b4cf3e2b35b336d05116ec464c4883c7aaf878) Thanks @mikearnaldi! - Prevent message loss when `Queue.take`, `takeAll`, `takeN`, `takeBetween`, `poll`, and `clear` are interrupted at a scheduler yield.
+
+- [#8784](https://github.com/Effect-TS/effect/pull/8784) [`a84aa4e`](https://github.com/Effect-TS/effect/commit/a84aa4e863dd1f03cc1316e52357b689bad4bade) Thanks @fubhy! - Fix FiberHandle losing ownership of fibers started by a synchronous replacement finalizer.
+
+- [#8776](https://github.com/Effect-TS/effect/pull/8776) [`50a5686`](https://github.com/Effect-TS/effect/commit/50a5686ab6ab0627572ed86a34288560cb9f8321) Thanks @fubhy! - Fix `Effect.effectify` so throwing error mappers become defects instead of escaping asynchronous callbacks and leaving fibers suspended.
+
+- [#8791](https://github.com/Effect-TS/effect/pull/8791) [`d85a309`](https://github.com/Effect-TS/effect/commit/d85a3095af16b8f69b623f0436fe57935cda86cf) Thanks @fubhy! - Fix `Queue.clear` swallowing failures combined with `Cause.Done`.
+
+- [#8785](https://github.com/Effect-TS/effect/pull/8785) [`7e7ede6`](https://github.com/Effect-TS/effect/commit/7e7ede67d838a10bf7b9324a6fcc0070cc8241d2) Thanks @fubhy! - Fix Queue consumers defecting and messages being buffered after reentrant shutdown while resuming blocked producers.
+
+- [#8779](https://github.com/Effect-TS/effect/pull/8779) [`1803500`](https://github.com/Effect-TS/effect/commit/18035009c92bf4aed95c92b0d34392042aa66469) Thanks @fubhy! - Mask interruption before invoking scope finalizer callbacks so singleton cleanup completes when its callback interrupts the closing fiber.
+
+- [#8795](https://github.com/Effect-TS/effect/pull/8795) [`495740d`](https://github.com/Effect-TS/effect/commit/495740d9d0134bde99a24e0dc96fdb197002beec) Thanks @fubhy! - Fix `Stream.zipLatest`, `zipLatestWith`, and `zipLatestAll` hanging when an input completes without emitting.
+
+- [#8825](https://github.com/Effect-TS/effect/pull/8825) [`90a1bae`](https://github.com/Effect-TS/effect/commit/90a1bae8987dfcf94db7302a109d48b3a3ce098c) Thanks @tim-smart! - Add configurable `pingInterval` and `pingTimeout` to RPC socket clients, counting any decoded server frame as liveness. Forward `retryPolicy` through `layerProtocolSocket`. The default ping interval and timeout remain 5 seconds.
+
+- [#8748](https://github.com/Effect-TS/effect/pull/8748) [`b1d200c`](https://github.com/Effect-TS/effect/commit/b1d200c40a1dad69def51ebdbf0a1a612a12b8ac) Thanks @gcanti! - Expose the selected tag property key through `tag` on schemas returned by `Schema.toTaggedUnion` and `Schema.TaggedUnion`, closes [#8681](https://github.com/Effect-TS/effect/issues/8681).
+
+- [#8764](https://github.com/Effect-TS/effect/pull/8764) [`1ba8521`](https://github.com/Effect-TS/effect/commit/1ba85215823b3ad9fe725619ecca4c2c39f3548b) Thanks @fubhy! - Fix the data-last `Sink.catchCause` overload to return the handler's error type instead of the original error type.
+
+- [#8794](https://github.com/Effect-TS/effect/pull/8794) [`f11526a`](https://github.com/Effect-TS/effect/commit/f11526aea2c65fdd110a1ddce13c510da08a9dea) Thanks @fubhy! - Fix `Stream.tapSink` swallowing sink failures after end-of-stream.
+
+- [#8817](https://github.com/Effect-TS/effect/pull/8817) [`8781388`](https://github.com/Effect-TS/effect/commit/87813882fafcd8e7ac6231f825c139df64636d23) Thanks @fubhy! - Fix `Channel.callback` and `Channel.callbackArray` losing registration effect failures and defects.
+
+- [#8796](https://github.com/Effect-TS/effect/pull/8796) [`5326527`](https://github.com/Effect-TS/effect/commit/53265279182da264091a278013dfd7fc430e89a2) Thanks @fubhy! - Fix `Channel.acquireUseRelease` leaking resources when interrupted during acquisition.
+
+- [#8813](https://github.com/Effect-TS/effect/pull/8813) [`8409eb4`](https://github.com/Effect-TS/effect/commit/8409eb45925e23c10a9fb5b9bd31baaafca25d81) Thanks @fubhy! - Fix Floyd-Warshall path reconstruction looping on zero-cost cycles after floating-point rounding.
+
+- [#8781](https://github.com/Effect-TS/effect/pull/8781) [`c5cf8ce`](https://github.com/Effect-TS/effect/commit/c5cf8ce40217e84bcd0f53c0125d9e3213e45a4e) Thanks @fubhy! - Fix `Layer.buildWithMemoMap` retries returning an already-finalized resource by deferring each build until execution.
+
+- [#8788](https://github.com/Effect-TS/effect/pull/8788) [`33303ea`](https://github.com/Effect-TS/effect/commit/33303ea6347d9db747d57f0b3cfa400b0c9225d1) Thanks @fubhy! - Fix Pool shutdown to wait for borrowed resources to be finalized before releasing owner scope dependencies.
+
+- [#8790](https://github.com/Effect-TS/effect/pull/8790) [`888a189`](https://github.com/Effect-TS/effect/commit/888a18915cabb00b9d81a118569f3f7c4d911dfb) Thanks @fubhy! - Reject NaN and fractional PubSub capacities to prevent nonterminating batch publication, while preserving Infinity support.
+
+- [#8787](https://github.com/Effect-TS/effect/pull/8787) [`9b8200d`](https://github.com/Effect-TS/effect/commit/9b8200da0fc8d60ece93f3c9f60f584436dcf43e) Thanks @fubhy! - Fix PubSub take and takeAll delivering the final message before data published during waiter registration.
+
+- [#8797](https://github.com/Effect-TS/effect/pull/8797) [`332d363`](https://github.com/Effect-TS/effect/commit/332d363f07ad1d83ef533f9e73688572b4777d75) Thanks @fubhy! - Fix `Sink.make` to return successful pipeline results instead of failing with a channel completion signal.
+
+- [#8806](https://github.com/Effect-TS/effect/pull/8806) [`a6c7dcb`](https://github.com/Effect-TS/effect/commit/a6c7dcb042893ef654ee3ff10950d4958b7b1cc3) Thanks @fubhy! - Preserve one-shot iterable inputs across transaction retries in TxPriorityQueue.offerAll, TxHashMap.fromIterable/setMany/removeMany, and TxHashSet.fromIterable.
+
 ## 4.0.1
 
 ### Patch Changes
